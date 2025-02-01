@@ -1,0 +1,54 @@
+\documentclass{diploma}
+
+\student{Мезенин Олег Александрович}
+\group{М8О-406Б-21}
+\theme{Проектирование системы переноса и генерации взаимосвязанных данных из производственной среды при тестировании образовательной платформы}
+
+\supervisor{Миронов Евгений Сергеевич}
+\firstConsultant{Ляпина Светлана Юрьевна}
+\secondConsultant{---}
+\reviewer{---}
+
+\faculty{№ 8 <<Компьютерные науки и прикладная математика>>}
+\department{806}
+\speciality{01.03.02 <<Прикладная математика и информатика>>}
+\profile{Информатика}
+
+% Здесь необходим разрыв строки из-за особенностей титульной страницы
+\departmentFullName{№ 806}
+\headOfDepartment{Крылов Сергей Сергеевич}
+
+% Дата. Оставляем пустое место для дня
+\date{\uline{\hspace{24pt}} мая \the\year\ года}
+
+\input{contents/terms}
+\input{contents/glossary}
+
+\addbibresource{main.bib}
+
+% Иллюстрации всегда по центру
+\makeatletter
+\g@addto@macro\@floatboxreset\centering
+\makeatother
+    
+\begin{document}
+\maketitle
+
+% \includepdf[pages=-]{extra/task} % Задание
+\setcounter{page}{2} % Устанавливает счётчик страниц
+
+\include{contents/abstract} % Реферат
+
+\tableofcontents % Содержание 
+\termsanddefenitions % Термины и определения
+\listofabbreviations % Перечень сокращений и обозначений
+
+\include{contents/introduction} % Введение
+
+\include{contents/conclusion} % Заключение
+
+\printbibliography % Список литературы
+
+\appendix % Приложения
+\include{contents/appendix-qr}
+\end{document}
