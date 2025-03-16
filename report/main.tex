@@ -30,6 +30,11 @@
 \makeatletter
 \g@addto@macro\@floatboxreset\centering
 \makeatother
+
+% Настройки для листинга
+\lstset{
+  literate={:=}{{$\gets$}}1 {<=}{{$\leq$}}1 {>=}{{$\geq$}}1 {<>}{{$\neq$}}1
+}
     
 \begin{document}
 \maketitle
