@@ -379,14 +379,190 @@ Data_Generator(MG, RME, SMV, GC, AV)
 \end{itemize}
 
 \subsection{Разработка языка}
-TBD: есть синтаксис языка, но нужно реализовать парсер. Структура этого раздела пока под вопросом
+Как упоминалась ранее, метаданные включают набор правил, описывающих способы переноса, генерации или анонимизации данных. Способ описания метаданных должен быть простым, понятным и гибким. В этом разделе рассматривается создание предметно-ориентированного языка программирования \cite{dsl-how-create}, предназначенного для описания метаданных.
 
-\subsubsection{Синтаксис и грамматика языка}
+\subsubsection{Синтаксис и семантика языка}
 
-\subsubsection{Полнота? языка}
+Разрабатываемый язык будет носить декларативный характер и использовать ряд SQL-операторов \cite{sql}. Опишем синтаксис и семантику языка.
 
-\subsubsection{Язык задания графа}
+Синтаксис будет представлен в расширенной форме Бэкуса-Наура \cite{ebnf}. Предположим, что для оператора \textit{WHERE} уже определен нетерминальный символ \textit{where\_statement}, а такие символы, как \textit{integer} для обозначения целого числа, \textit{table} для идентификации названия таблиц, \textit{field} для обозначения названия поля, и \textit{function\_name} для обозначения названия функции, уже введены. К тому же, все конструкции должны оканчиваться на символ ";".
 
-\subsubsection{Язык переноса данных}
+Также будет указан синтаксис вызова функции \textit{function\_call}.
 
-\subsubsection{Язык генерации данных}
+\begin{figure}
+  \begin{lstlisting}
+function_call = function_name, ["(", argument, {",", argument}, ")"];
+  \end{lstlisting}
+  \caption{function\_call}
+  \label{symbol-function-call}
+\end{figure}
+
+Синтаксис определения функции в рамках данной работы не рассматривается.
+
+\paragraph{GRAPH SOURCE}
+
+\begin{figure}
+  \begin{lstlisting}
+graph_source = "GRAPH SOURCE", " ", table, [" ", where_statement];
+  \end{lstlisting}
+  \caption{GRAPH SOURCE}
+  \label{symbol-graph-source}
+\end{figure}
+
+С помощью данной конструкции определяется стартовая вершина, данные которой находятся в таблице \textit{table}. Если присутствует конструкция \textit{where\_statement}, применяется соответствующее фильтрование данных.
+
+\paragraph{INCLUDE EDGE и EXCLUDE EDGE}
+
+\begin{figure}
+  \begin{lstlisting}
+include_edge = "INCLUDE EDGE", " ", table, ".", field, " ", table, ".", field;
+exclude_edge = "EXCLUDE EDGE", " ", table, ".", field, " ", table, ".", field;
+  \end{lstlisting}
+  \caption{INCLUDE EDGE и EXCLUDE EDGE}
+  \label{symbol-include-exclude-edge}
+\end{figure}
+
+Данные конструкции позволяют включать или исключать метаребро между двумя метавершинами, ассоциированными с указанными таблицами. Названия полей входят в атрибуты метаребра и означают, что ребро существует (или не существует), если для указанных полей значения совпадают.
+
+\paragraph{NO ENTER}
+
+\begin{figure}
+  \begin{lstlisting}
+no_enter = "NO ENTER", " ", table, [" ", where_statement];
+  \end{lstlisting}
+  \caption{NO ENTER}
+  \label{symbol-no-enter}
+\end{figure}
+
+Конструкция \textit{NO ENTER} позволяет удалить метарёбра, входящие в метавершину, соответствующую таблице \textit{table}. В случае если задана конструкция \textit{where\_statement}, удаляются входящие в вершину рёбра, данные которых соответствуют фильтру.
+
+\paragraph{NO EXIT}
+
+\begin{figure}
+  \begin{lstlisting}
+no_exit = "NO EXIT", " ", table, [" ", where_statement];
+  \end{lstlisting}
+  \caption{NO EXIT}
+  \label{symbol-no-exit}
+\end{figure}
+
+Посредством конструкции \textit{NO EXIT} удаляются метарёбра, выходящие из метавершины, ассоциированной с таблицей \textit{table}. Если конструкция \textit{where\_statement} указана, это приводит к удалению выходящих из вершины рёбер, данные которых проходят фильтрацию.
+
+\paragraph{LIMIT VISITS}
+
+\begin{figure}
+  \begin{lstlisting}
+limit_visits = "LIMIT VISITS", " ", integer, " ", "FOR", " ", table;
+  \end{lstlisting}
+  \caption{LIMIT VISITS}
+  \label{symbol-limit-visits}
+\end{figure}
+
+Конструкция \textit{LIMIT VISITS} позволяет ограничить число посещений вершин, находящихся в метавершине, соответствующей таблице \textit{table}. Параметр \textit{integer} определяет максимальное количество посещений.
+
+\paragraph{LIMIT DISTANCE}
+
+\begin{figure}
+  \begin{lstlisting}
+limit_distance = "LIMIT DISTANCE", " ", integer, " ", "FOR", " ", table;
+  \end{lstlisting}
+  \caption{LIMIT DISTANCE}
+  \label{symbol-limit-distance}
+\end{figure}
+
+Эта конструкция позволяет ограничить длину пути по метарёбрам. В частности, она способствует удалению всех метарёбер (и соответствующих рёбер), находящихся на расстоянии, превышающем \textit{integer} метавершин от метавершины, связанной с таблицей \textit{table}.
+
+\paragraph{TRANSFORMER}
+
+\begin{figure}
+  \begin{lstlisting}
+transformer = "TRANSFORMER", " ", function_call, " ", "FOR", " ", table, ".", field, {",", table, ".", field};
+  \end{lstlisting}
+  \caption{TRANSFORMER}
+  \label{symbol-transformer}
+\end{figure}
+
+Конструкция \textit{TRANSFORMER} позволяет установить трансформер для определённых полей, при этом он задаётся функцией. Поля таблиц, к которым необходимо применить трансформер при переносе данных, указываются после ключевого слова \textit{"FOR"}.
+
+\paragraph{SET GENERATION VALUES}
+
+\begin{figure}
+  \begin{lstlisting}
+set_of_values = "{", value, {",", value}, "}";
+range_of_values = "[", integer, ":", integer, "]";
+set_valid_values = "SET GENERATION VALUES", " ", set_of_values|range_of_values|function_call, " ", "FOR", " ", table, ".", field, {",", table, ".", field};
+  \end{lstlisting}
+  \caption{SET GENERATION VALUES}
+  \label{symbol-set-generation-values}
+\end{figure}
+
+Данная конструкция служит для определения множества, диапазона или функции, необходимых для генерации значений соответствующих полей. Здесь символ \textit{value} представляет собой произвольную последовательность символов, применимую в качестве значения для поля.
+
+\paragraph{SET GENERATION AMOUNT}
+
+\begin{figure}
+  \begin{lstlisting}
+set_valid_values = "SET GENERATION AMOUNT", " ", table, "=", integer, {", ", table, "=", integer};
+  \end{lstlisting}
+  \caption{SET GENERATION AMOUNT}
+  \label{symbol-set-generation-amount}
+\end{figure}
+
+С помощью этой конструкции можно задать количество генерируемых данных для каждой указанной таблицы.
+
+\subsubsection{Примеры}
+
+Примеры рассматриваются на основе базы данных \ref{db-example}.
+
+\begin{figure}
+  \begin{lstlisting}
+GRAPH SOURCE classes WHERE class_id=1;
+
+NO ENTER teachers;
+
+TRANSFORMER random_first_name FOR students.first_name;
+TRANSFORMER random_last_name FOR students.last_name;
+TRANSFORMER set_birth_data("2000-01-01") FOR students.birth_data;
+  \end{lstlisting}
+  \caption{Пример описания метаданных 1}
+  \label{metadata-example-1}
+\end{figure}
+
+Метаданные, приведенные в примере \ref{metadata-example-1}, позволяют перенести все данные, связанные с классом, идентифицируемым как \textit{class\_id=1}, при этом исключая перенос таблиц \textit{teachers}. Кроме того, данные учащихся будут анонимизированы: генерируются случайные имя и фамилия и устанавливается фиксированная дата рождения.
+
+\begin{figure}
+  \begin{lstlisting}
+GRAPH SOURCE lessons;
+
+EXCLUDE EDGE lessons.class_id classes.class_id;
+LIMIT VISITS 2 FOR teachers;
+
+TRANSFORMER set("Anon") FOR teachers.first_name, teachers.last_name;
+  \end{lstlisting}
+  \caption{Пример описания метаданных 2}
+  \label{metadata-example-2}
+\end{figure}
+
+Пример \ref{metadata-example-2} включает метаданные, описывающие перенос таблиц \textit{lessons} и \textit{subjects} со всеми данными и двух случайных учителей из таблицы \textit{teachers}, для которых имя и фамилия будут заданы как \textit{"Anon"}.
+
+\begin{figure}
+  \begin{lstlisting}
+GRAPH SOURCE lessons;
+
+LIMIT DISTANCE 1 FOR lessons;
+
+SET GENERATION VALUES gen_date("2020-01-01", "2025-01-01") FOR lessons.data;
+SET GENERATION VALUES ["Class 1A", "Class 1B", "Class 1C"} FOR classes.name;
+SET GENERATION VALUES gen_random_subject FOR subjects.name;
+
+SET GENERATION AMOUNT lessons=10, classes=5, subjects=10;
+  \end{lstlisting}
+  \caption{Пример описания метаданных 3}
+  \label{metadata-example-3}
+\end{figure}
+
+Пример \ref{metadata-example-3} демонстрирует метаданные, описывающие процесс генерации данных.
+
+\subsubsection{Имплементация языка}
+
+TBD: написать, что для имплементации использовался инструмент ANTLR и в качестве базы для грамматики была взята грамматика диалекта SQLite. Можно скинуть несколько примеров своих символов и прикрепить пример с AST (картинкой).
