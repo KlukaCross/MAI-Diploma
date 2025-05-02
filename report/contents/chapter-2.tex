@@ -383,7 +383,7 @@ Data_Generator(MG, RME, SMV, GC, AV)
 
 \subsubsection{Синтаксис и семантика языка}
 
-Разрабатываемый язык будет носить декларативный характер и использовать ряд SQL-операторов \cite{sql}. Опишем синтаксис и семантику языка.
+Разрабатываемый язык будет носить декларативный характер и использовать ряд SQL-операторов \cite{sql}. Опишем синтаксис и семантику языка \cite{syntax-and-semantics}.
 
 Синтаксис будет представлен в расширенной форме Бэкуса-Наура \cite{ebnf}. Предположим, что для оператора \textit{WHERE} уже определен нетерминальный символ \textit{where\_statement}, а такие символы, как \textit{integer} для обозначения целого числа, \textit{table} для идентификации названия таблиц, \textit{field} для обозначения названия поля, и \textit{function\_name} для обозначения названия функции, уже введены. К тому же, все конструкции должны оканчиваться на символ ";".
 
@@ -490,7 +490,7 @@ transformer = "TRANSFORMER", " ", function_call, " ", "FOR", " ", table, ".", fi
   \begin{lstlisting}
 set_of_values = "{", value, {",", value}, "}";
 range_of_values = "[", integer, ":", integer, "]";
-set_valid_values = "SET GENERATION VALUES", " ", set_of_values|range_of_values|function_call, " ", "FOR", " ", table, ".", field, {",", table, ".", field};
+set_generation_values = "SET GENERATION VALUES", " ", set_of_values|range_of_values|function_call, " ", "FOR", " ", table, ".", field, {",", table, ".", field};
   \end{lstlisting}
   \caption{SET GENERATION VALUES}
   \label{symbol-set-generation-values}
@@ -502,7 +502,7 @@ set_valid_values = "SET GENERATION VALUES", " ", set_of_values|range_of_values|f
 
 \begin{figure}
   \begin{lstlisting}
-set_valid_values = "SET GENERATION AMOUNT", " ", table, "=", integer, {", ", table, "=", integer};
+set_generation_amount = "SET GENERATION AMOUNT", " ", table, "=", integer, {", ", table, "=", integer};
   \end{lstlisting}
   \caption{SET GENERATION AMOUNT}
   \label{symbol-set-generation-amount}
@@ -563,6 +563,95 @@ SET GENERATION AMOUNT lessons=10, classes=5, subjects=10;
 
 Пример \ref{metadata-example-3} демонстрирует метаданные, описывающие процесс генерации данных.
 
-\subsubsection{Имплементация языка}
+\subsubsection{Грамматика языка и синтаксический анализатор}
+Рассмотрим разработку грамматики языка и реализацию синтаксического анализатора \cite{parsers} с использованием инструмента ANTLR4 \cite{antlr}. В качестве основы для построения грамматики была выбрана грамматика языка SQLite \cite{sqlite-parser}.
 
-TBD: написать, что для имплементации использовался инструмент ANTLR и в качестве базы для грамматики была взята грамматика диалекта SQLite. Можно скинуть несколько примеров своих символов и прикрепить пример с AST (картинкой).
+\begin{figure}
+  \begin{lstlisting}
+graph_source_stmt: GRAPH_ SOURCE_ table_name (WHERE_ expr)?;
+include_edge_stmt: INCLUDE_ EDGE_ table_name DOT column_name table_name DOT column_name;
+exclude_edge_stmt: EXCLUDE_ EDGE_ table_name DOT column_name table_name DOT column_name;
+no_enter_stmt: NO_ ENTER_ table_name (WHERE_ expr)?;
+no_exit_stmt: NO_ EXIT_ table_name (WHERE_ expr)?;
+limit_visits_stmt: LIMIT_ VISITS_ INTEGER_LITERAL FOR_ table_name;
+limit_distance_stmt: LIMIT_ DISTANCE_ INTEGER_LITERAL FOR_ table_name;
+transformer_stmt: TRANSFORMER_ function_call FOR_ table_name DOT column_name (COMMA table_name DOT column_name)*;
+set_generation_values_stmt: SET_ GENERATION_ VALUES_ (set_of_values | range_of_values | function_call) FOR_ table_name DOT column_name (COMMA table_name DOT column_name)*;
+set_generation_amount_stmt: SET_ GENERATION_ AMOUNT_ table_name ASSIGN INTEGER_LITERAL (COMMA table_name ASSIGN INTEGER_LITERAL)*;
+  \end{lstlisting}
+  \caption{Описание основных конструкций в формате грамматики ANTLR4}
+  \label{antlr4-grammar}
+\end{figure}
+
+На рисунке \ref{antlr4-grammar} представлены основные конструкции в формате грамматики ANTLR4, которые ранее были описаны на основе расширенной формы Бэкуса-Наура.
+
+\begin{figure}
+  \begin{lstlisting}
+GRAPH SOURCE classes WHERE class_id=1;
+
+NO ENTER teachers;
+  \end{lstlisting}
+  \caption{Пример описания метаданных 4}
+  \label{metadata-example-4}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[scale=0.5]{./img/antlr4-parse-tree.png}
+  \caption{Пример дерева синтаксического анализа}
+  \label{antlr4-parse-tree}
+\end{figure}
+
+На рисунке \ref{antlr4-parse-tree} представлен пример дерева синтаксического анализа, сгенерированного с помощью синтаксического анализатора, применительно к тексту \ref{metadata-example-4}.
+
+С использованием ANTLR4 на языке Python был сгенерирован синтаксический анализатор. Кроме того, была разработана программа, демонстрирующая возможности использования объектов ANTLR4.
+
+\begin{figure}
+  \begin{lstlisting}[language=Python]
+from antlr4 import FileStream, CommonTokenStream, ParseTreeWalker
+from RelatioLangLexer import RelatioLangLexer
+from RelatioLangParser import RelatioLangParser
+from RelatioLangParserListener import RelatioLangParserListener
+from tools import get_original_token_text
+
+class RelatioLangListener(RelatioLangParserListener):
+    def exitGraph_source_stmt(self, ctx:RelatioLangParser.Graph_source_stmtContext):
+        print("GRAPH SOURCE:")
+        print(f"\ttable is \"{ctx.table_name().getText()}\"")
+        if ctx.expr() is not None:
+            print(f"\twhere statement is \"{get_original_token_text(ctx.expr())}\"")
+
+    def exitNo_enter_stmt(self, ctx:RelatioLangParser.No_enter_stmtContext):
+        print("NO ENTER:")
+        print(f"\ttable is \"{ctx.table_name().getText()}\"")
+
+def main():
+    filename = input()
+    input_stream = FileStream(filename)
+    lexer = RelatioLangLexer(input_stream)
+    stream = CommonTokenStream(lexer)
+    parser = RelatioLangParser(stream)
+    tree = parser.parse()
+    relatio_lang_listiner = RelatioLangListener()
+    walker = ParseTreeWalker()
+    walker.walk(relatio_lang_listiner, tree)
+  \end{lstlisting}
+  \caption{Код c логикой обработки конструкций GRAPH SOURCE и NO ENTER}
+  \label{antlr4-program}
+\end{figure}
+
+\begin{figure}
+  \begin{lstlisting}
+GRAPH SOURCE:
+        table is "classes"
+        where statement is "class_id=1"
+
+NO ENTER:
+        table is "teachers"
+  \end{lstlisting}
+  \caption{Пример работы программы, обрабатывающей конструкции}
+  \label{antlr4-program-out}
+\end{figure}
+
+Обход синтаксического дерева производится с использованием объекта ANTLR Слушатель (Listener), что позволяет реализовать соответствующую логику обработки для каждой конструкции. На рисунке \ref{antlr4-program} представлена демонстрация кода обработки конструкций \textit{GRAPH SOURCE} и \textit{NO ENTER}, которая подразумевает простое отображение содержимого токенов. На рисунке \ref{antlr4-program-out} представлен вывод данной программы, соответствующий примеру \ref{metadata-example-4}.
+
+Использование ANTLR4 для генерации синтаксического анализатора демонстрирует его эффективность в разборе и обработке грамматических конструкций. Такой подход не только упрощает процесс разработки грамматик, но и предоставляет гибкие возможности для расширения логики обработки, что позволяет интегрировать более сложные структуры и правила в дальнейшем.
