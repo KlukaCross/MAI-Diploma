@@ -1,0 +1,121 @@
+2025-05-03 17:27:49,371 - sql_queries - INFO - CREATE EXTENSION IF NOT EXISTS postgres_fdw;
+    CREATE SERVER IF NOT EXISTS remote_fdw FOREIGN DATA WRAPPER postgres_fdw
+        OPTIONS (dbname 'school_platform_db', host 'school_platform_db_container', port '5432');
+
+    CREATE USER MAPPING IF NOT EXISTS
+        FOR "user" SERVER remote_fdw OPTIONS (user 'myuser', password 'mypassword');
+    GRANT USAGE ON FOREIGN SERVER remote_fdw TO "user";
+
+    DROP SCHEMA IF EXISTS "remote" CASCADE;
+    CREATE SCHEMA IF NOT EXISTS "remote";
+    IMPORT FOREIGN SCHEMA "public" FROM SERVER remote_fdw INTO "remote";
+
+2025-05-03 17:27:49,389 - sql_queries - INFO - SELECT c.relname, c.oid
+        FROM pg_class c
+        JOIN pg_namespace n ON c.relnamespace = n.oid
+        WHERE c.relkind = 'r'
+            AND n.nspname = 'public';
+
+2025-05-03 17:27:49,389 - sql_queries - INFO - SELECT ftoptions, ftrelid FROM pg_foreign_table
+
+2025-05-03 17:27:49,427 - sql_queries - INFO - SELECT ctid, tableoid FROM classes WHERE class_id=1
+
+2025-05-03 17:27:49,428 - sql_queries - INFO - INSERT INTO public.classes
+        SELECT * FROM remote.classes WHERE ctid = '(0,1)' AND tableoid = '16436'
+        ON CONFLICT ("class_id")
+        DO UPDATE SET ("class_id","name")=(EXCLUDED.class_id,EXCLUDED.name)
+
+2025-05-03 17:27:49,441 - sql_queries - INFO - SELECT ctid, tableoid FROM lessons
+                WHERE (class_id) = (
+                    SELECT (class_id) FROM classes
+                        WHERE ctid = '(0,1)' AND tableoid = '16386'
+                )
+
+2025-05-03 17:27:49,441 - sql_queries - INFO - SELECT ctid, tableoid FROM students
+                WHERE (class_id) = (
+                    SELECT (class_id) FROM classes
+                        WHERE ctid = '(0,1)' AND tableoid = '16386'
+                )
+
+2025-05-03 17:27:49,442 - sql_queries - INFO - INSERT INTO public.lessons
+        SELECT * FROM remote.lessons WHERE ctid = '(0,1)' AND tableoid = '16439'
+        ON CONFLICT ("lesson_id")
+        DO UPDATE SET ("lesson_id","date","class_id","subject_id")=(EXCLUDED.lesson_id,EXCLUDED.date,EXCLUDED.class_id,EXCLUDED.subject_id)
+
+2025-05-03 17:27:49,442 - sql_queries - INFO - SELECT ctid, tableoid FROM classes
+                WHERE (class_id) = (
+                    SELECT (class_id) FROM lessons
+                        WHERE ctid = '(0,1)' AND tableoid = '16424'
+                )
+
+2025-05-03 17:27:49,443 - sql_queries - INFO - SELECT ctid, tableoid FROM subjects
+                WHERE (subject_id) = (
+                    SELECT (subject_id) FROM lessons
+                        WHERE ctid = '(0,1)' AND tableoid = '16424'
+                )
+
+2025-05-03 17:27:49,443 - sql_queries - INFO - INSERT INTO public.lessons
+        SELECT * FROM remote.lessons WHERE ctid = '(0,3)' AND tableoid = '16439'
+        ON CONFLICT ("lesson_id")
+        DO UPDATE SET ("lesson_id","date","class_id","subject_id")=(EXCLUDED.lesson_id,EXCLUDED.date,EXCLUDED.class_id,EXCLUDED.subject_id)
+
+2025-05-03 17:27:49,444 - sql_queries - INFO - SELECT ctid, tableoid FROM classes
+                WHERE (class_id) = (
+                    SELECT (class_id) FROM lessons
+                        WHERE ctid = '(0,3)' AND tableoid = '16424'
+                )
+
+2025-05-03 17:27:49,444 - sql_queries - INFO - SELECT ctid, tableoid FROM subjects
+                WHERE (subject_id) = (
+                    SELECT (subject_id) FROM lessons
+                        WHERE ctid = '(0,3)' AND tableoid = '16424'
+                )
+
+2025-05-03 17:27:49,444 - sql_queries - INFO - INSERT INTO public.students
+        SELECT * FROM remote.students WHERE ctid = '(0,1)' AND tableoid = '16442'
+        ON CONFLICT ("student_id")
+        DO UPDATE SET ("student_id","first_name","last_name","birth_date","class_id")=(EXCLUDED.student_id,EXCLUDED.first_name,EXCLUDED.last_name,EXCLUDED.birth_date,EXCLUDED.class_id)
+
+2025-05-03 17:27:49,445 - sql_queries - INFO - SELECT ctid, tableoid FROM classes
+                WHERE (class_id) = (
+                    SELECT (class_id) FROM students
+                        WHERE ctid = '(0,1)' AND tableoid = '16400'
+                )
+
+2025-05-03 17:27:49,445 - sql_queries - INFO - INSERT INTO public.students
+        SELECT * FROM remote.students WHERE ctid = '(0,3)' AND tableoid = '16442'
+        ON CONFLICT ("student_id")
+        DO UPDATE SET ("student_id","first_name","last_name","birth_date","class_id")=(EXCLUDED.student_id,EXCLUDED.first_name,EXCLUDED.last_name,EXCLUDED.birth_date,EXCLUDED.class_id)
+
+2025-05-03 17:27:49,445 - sql_queries - INFO - SELECT ctid, tableoid FROM classes
+                WHERE (class_id) = (
+                    SELECT (class_id) FROM students
+                        WHERE ctid = '(0,3)' AND tableoid = '16400'
+                )
+
+2025-05-03 17:27:49,446 - sql_queries - INFO - INSERT INTO public.subjects
+        SELECT * FROM remote.subjects WHERE ctid = '(0,1)' AND tableoid = '16445'
+        ON CONFLICT ("subject_id")
+        DO UPDATE SET ("subject_id","name")=(EXCLUDED.subject_id,EXCLUDED.name)
+
+2025-05-03 17:27:49,446 - sql_queries - INFO - SELECT ctid, tableoid FROM lessons
+                WHERE (subject_id) = (
+                    SELECT (subject_id) FROM subjects
+                        WHERE ctid = '(0,1)' AND tableoid = '16393'
+                )
+
+2025-05-03 17:27:49,447 - sql_queries - INFO - INSERT INTO public.subjects
+        SELECT * FROM remote.subjects WHERE ctid = '(0,3)' AND tableoid = '16445'
+        ON CONFLICT ("subject_id")
+        DO UPDATE SET ("subject_id","name")=(EXCLUDED.subject_id,EXCLUDED.name)
+
+2025-05-03 17:27:49,450 - sql_queries - INFO - SELECT ctid, tableoid FROM lessons
+                WHERE (subject_id) = (
+                    SELECT (subject_id) FROM subjects
+                        WHERE ctid = '(0,3)' AND tableoid = '16393'
+                )
+
+2025-05-03 17:27:49,458 - sql_queries - INFO - DROP SCHEMA IF EXISTS "remote" CASCADE
+
+2025-05-03 17:27:49,458 - sql_queries - INFO - DROP SERVER IF EXISTS remote_fdw CASCADE
+

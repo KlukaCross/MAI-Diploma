@@ -1,0 +1,16 @@
+{
+  "source_rules": [
+    {
+      "table": "classes",
+      "where": "class_id=1"
+    }
+  ],
+  "traversal_rules": [
+    {
+      "type": "no_enter",
+      "values": [
+        {"table": "teachers"}
+      ]
+    }
+  ]
+}

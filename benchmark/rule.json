@@ -1,0 +1,5 @@
+{
+  "source_rules": [{"table": "teachers", "where": "teacher_id=1"}],
+  "traversal_rules": []
+}
+

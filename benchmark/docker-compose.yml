@@ -1,0 +1,33 @@
+services:
+  bench-source-db:
+    image: postgres:latest
+    container_name: benchmark_source_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: source
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./create_tables_scripts:/scripts
+    networks:
+      - benchmark_db_network
+
+  bench-target-db:
+    image: postgres:latest
+    container_name: benchmark_target_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: target
+    ports:
+      - "5433:5432"
+    networks:
+      - benchmark_db_network
+
+volumes:
+  db_data:
+
+networks:
+  benchmark_db_network:
