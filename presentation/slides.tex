@@ -1,0 +1,144 @@
+\documentclass[pdf, hyperref={unicode}, aspectratio=169]{beamer}
+
+\usepackage{./diploma-slides-latex-template/styles}
+
+% Включаю кнопочки
+\setbeamertemplate{navigation symbols}[default]
+
+% Название темы слишком длинное, поменьше шрифт!
+\setbeamerfont{title}{series=\bfseries, size=\large}
+\setbeamerfont{footline}{series=\bfseries, size=\fontsize{5}{3}\selectfont}
+
+\useoutertheme{miniframes}
+
+\input{titlepage}
+
+\begin{document}
+
+\epstopdfsetup{outdir=./}
+
+{
+	% убирает номер слайда с титульного слайда
+	\setbeamertemplate{page number in head/foot}{}
+	\frame{\titlepage}
+}
+
+\section{Актуальность темы}
+\begin{frame}
+	\frametitle{Актуальность темы}
+	\begin{itemize}
+		\item Тестирование программного продукта крайне важно. \\ Для тестовых сценариев нужны данные.
+		\item Тестирование нельзя проводить в производственной среде, нельзя работать с персональными данными.
+		\item Есть вариант копировать все данные из производственной среды в тестовую с применением анонимизиации, но такой вариант может занимать много времени.
+		\item Часто для тестовых сценариев не нужно много данных, но нужны согласованные данные.
+	\end{itemize}
+\end{frame}
+
+
+\section{Цель и задачи работы}
+\begin{frame}
+	\frametitle{Цель и задачи работы}
+	
+	\textbf{Цель} --- проектирование системы, обеспечивающей перенос взаимосвязанных данных между базами данных, анонимизиацию данных, генерацию тестовых данных. В рамках работы предполагается реализация прототипа данной системы и проведение анализа её жизнеспособности.
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Цель и задачи работы}
+	
+	\textbf{Задачи:}
+	\begin{enumerate}
+		\item определение требований к проектируемой системе,
+		\item анализ и исследование существующих аналогов,
+		\item проектирование архитектуры системы,
+		\item разработка алгоритма переноса и генерации взаимосвязанных данных,
+		\item разработка языка для описания данных,
+		\item реализация прототипа системы,
+		\item анализ полученных результатов.
+	\end{enumerate}
+\end{frame}
+
+
+\section{Постановка задачи}
+\begin{frame}
+	\frametitle{Постановка задачи}
+	
+	Система должна иметь следующую функциональность:
+
+	\begin{itemize}
+		\item перенос и анонимизация данных,
+		\item генерация данных.
+	\end{itemize}
+
+	Архитектура системы должна иметь следующие свойства:
+	
+	\begin{itemize}
+		\item безопасность,
+		\item производительность,
+		\item надёжность.
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Архитектура системы}
+	Взаимодействие систем
+
+	\begin{center}
+		\includegraphics[height = 6cm]{img/structurizr-SystemLandspace}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Архитектура системы}
+	Система переноса и генерации данных
+
+	\begin{center}
+		\includegraphics[height = 6cm]{img/structurizr-Containers}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Архитектура системы}
+	Компоненты Data Transfer
+
+	\begin{center}
+		\includegraphics[height = 6cm]{img/structurizr-DataTransferComponents}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Метаграфы}
+	Предпосылки к использованию метаграфов:
+
+	\begin{itemize}
+		\item система данных в БД и их взаимосвязей напоминает граф,
+		\item классические графы не подходят из-за сложной модели объектов в БД.
+	\end{itemize}
+
+	Пусть $MG = \langle V, MV, E, ME \rangle$ -- метаграф, где $V$ -- множество вершин, $MV$ -- множество метавершин, $E$ -- множество рёбер, $ME$ -- множество метарёбер.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Метаграфы}
+	Пример базы данных
+
+	\begin{center}
+		\includegraphics[width = 13cm]{img/jailer-example-db}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Метаграфы}
+	Графическое отображение метаграфа
+
+	\begin{center}
+		\includegraphics[height = 6cm]{img/drawio-metagraph}
+	\end{center}
+\end{frame}
+
+\end{document}
