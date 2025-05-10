@@ -480,3 +480,7 @@ cython_debug/
 
 # Ignore prototype because bin file maybe NDA
 benchmark/prototype
+
+# Ignore large files
+benchmark/test_scripts/insert_data.sql
+benchmark/test_scripts/insert_data_sep.sql
