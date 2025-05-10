@@ -1,0 +1,5 @@
+
+{
+  "source_rules": [{"table": "classes", "where": "class_id=49 OR class_id=50 OR class_id=51 OR class_id=52 OR class_id=53 OR class_id=54 OR class_id=55 OR class_id=56 OR class_id=57 OR class_id=58 OR class_id=59 OR class_id=60 OR class_id=61 OR class_id=62 OR class_id=63 OR class_id=64 OR class_id=65 OR class_id=66 OR class_id=67 OR class_id=68 OR class_id=69 OR class_id=70 OR class_id=71 OR class_id=72 OR class_id=73 OR class_id=74 OR class_id=75 OR class_id=76 OR class_id=77 OR class_id=78 OR class_id=79 OR class_id=80 OR class_id=81 OR class_id=82 OR class_id=83 OR class_id=84 OR class_id=85 OR class_id=86 OR class_id=87 OR class_id=88 OR class_id=89 OR class_id=90 OR class_id=91 OR class_id=92 OR class_id=93 OR class_id=94 OR class_id=95 OR class_id=96 OR class_id=97 OR class_id=98 OR class_id=99 OR class_id=100 OR class_id=101 OR class_id=102 OR class_id=103 OR class_id=104 OR class_id=105 OR class_id=106 OR class_id=107 OR class_id=108 OR class_id=109 OR class_id=110 OR class_id=111 OR class_id=112"}],
+  "traversal_rules": []
+}

@@ -1,0 +1,5 @@
+
+{
+  "source_rules": [{"table": "classes", "where": "class_id=1 OR class_id=2 OR class_id=3 OR class_id=4 OR class_id=5 OR class_id=6 OR class_id=7 OR class_id=8 OR class_id=9 OR class_id=10 OR class_id=11 OR class_id=12 OR class_id=13 OR class_id=14 OR class_id=15 OR class_id=16"}],
+  "traversal_rules": []
+}
