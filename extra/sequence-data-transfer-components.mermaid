@@ -1,0 +1,123 @@
+sequenceDiagram
+
+participant request_handler as Request Handler
+
+participant topic as LogBroker
+
+participant data_manager as Data Manager
+
+participant graph_walker as Graph Walker
+
+participant state_db as State Database
+
+participant data_writer as Data Writer
+
+participant target_db as Target Database
+
+participant source_db as Source Database
+
+
+
+activate request_handler
+
+activate topic
+
+activate state_db
+
+activate source_db
+
+activate target_db
+
+
+
+request_handler->>topic: Read Operation topic with type="Data Transfer"
+
+topic->>request_handler: Operation: ID=op_id + metadata
+
+request_handler->>state_db: Create state: ID=op_id + metadata
+
+request_handler->>topic: Commit offset
+
+request_handler->>data_manager: Start data transfer: ID=op_id + metadata
+
+deactivate request_handler
+
+
+
+activate data_manager
+
+data_manager->>data_writer: Start
+
+activate data_writer
+
+data_manager->>graph_walker: Start
+
+activate graph_walker
+
+deactivate data_manager
+
+
+
+loop Data transfer
+
+par Transfer some data
+
+graph_walker->>source_db: Read data
+
+source_db->>graph_walker: Metainfo
+
+graph_walker->>graph_walker: Process
+
+graph_walker->>state_db: Update state
+
+graph_walker->>data_writer: Metainfo
+
+and
+
+data_writer->>data_writer: Make query
+
+data_writer->>target_db: Send query
+
+target_db->>source_db: Read data
+
+source_db->>target_db: Data
+
+end
+
+end
+
+deactivate graph_walker
+
+deactivate data_writer
+
+activate data_manager
+
+
+
+data_manager->>target_db: Commit
+
+data_manager->>state_db: Update state ID=op_id: "finish"
+
+data_manager->>request_handler: Finish
+
+deactivate data_manager
+
+
+
+activate request_handler
+
+request_handler->>topic: Send operation result to Operation result topic: ID=op_id + status="completed"
+
+request_handler->>state_db: Update state ID=op_id: "completed"
+
+
+
+deactivate topic
+
+deactivate request_handler
+
+deactivate state_db
+
+deactivate source_db
+
+deactivate target_db

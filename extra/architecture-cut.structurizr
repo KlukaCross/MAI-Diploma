@@ -1,0 +1,153 @@
+workspace "Data manager workspace"
+
+    model {
+        user = person "Пользователь" "Например, разработчик или тестировщик"
+        developer = person "Разработчик" "" "Dev Person"
+
+        vcs = softwaresystem "Система контроля версий" "Хранит метаданные" "Existing System"
+        secrets = softwaresystem "Система управления секретами" "Хранит и выдаёт 'секреты'" "Existing System"
+
+        source = softwaresystem "Исходная база данных" "Например, производственная база данных" "Database"
+        target = softwaresystem "Целевая базы данных" "Например, тестовая база данных" "Database"
+
+        main_system = softwaresystem "Система переноса и генерации данных" {
+            op_manager = container "Operation manager" "Управляет операциями -- запросами от пользователей" "Python"
+            op_db = container "Operation database" "Хранит операции пользователей" "Postgresql"
+
+            op_topic_in = container "Operation topic" "Топик очереди сообщений для операций и их параметров" "LogBroker" "Queue"
+            op_topic_out = container "Operation result topic" "Топик очереди сообщений для результатов операций" "LogBroker" "Queue"
+
+            data_transfer_service = container "Data transfer" "Переносит взаимосвязанные данные и трансформирует их" "Python" {
+                request_handler_transfer = component "Request Handler" "Обрабатывает запросы из очереди" ""
+                graph_walker = component "Graph Walker" "'Ходит' по графу данных" ""
+                data_writer = component "Data Writer" "Создаёт запросы на запись данных" ""
+                transformer_factory = component "Transformer Factory" "Создаёт трансформеры данных" ""
+            }
+            data_generator_service = container "Data generator" "Генерирует взаимосвязанные данные" "Python" {
+                request_handler_generator = component "Request Handler" "Обрабатывает запросы из очереди" ""
+                task_manager_generator = component "Task Manager" "Управляет задачами" ""
+                dsl_parser_generator = component "Metadata Parser" "Преобразует входные данные в структурированный формат"
+                data_generator = component "Data Generator" "Генерирует данные" ""
+            }
+        }
+
+
+        # relationships between people and software systems
+        user -> main_system "Взаимодействует"
+        user -> target "Имеет доступ"
+        developer -> vcs "Отправляет метаданные"
+
+        main_system -> secrets "Забирает секреты"
+        main_system -> source "Взаимодействует"
+        main_system -> target "Взаимодействует"
+
+        # relationships to/from containers
+        user -> op_manager "Взаимодействует"
+
+        op_manager -> op_db "Записывает и читает"
+        op_manager -> op_topic_in "Публикует"
+        op_manager -> op_topic_out "Подписывается"
+
+        data_transfer_service -> op_topic_in "Подписывается"
+        data_transfer_service -> op_topic_out "Публикует"
+        data_generator_service -> op_topic_in "Подписывается"
+        data_generator_service -> op_topic_out "Публикует"
+
+        data_transfer_service -> source "Читает"
+        data_transfer_service -> target "Записывает"
+        data_generator_service -> source "Читает"
+        data_generator_service -> target "Записывает"
+
+        # relationships to/from components
+        request_handler_transfer -> op_topic_in "Забирает запрос"
+        request_handler_transfer -> op_topic_out "Отправляет ответ"
+        request_handler_transfer -> graph_walker "Управляет"
+        request_handler_transfer -> data_writer "Управляет"
+        graph_walker -> source "Читает"
+        graph_walker -> data_writer "Передаёт вершины"
+        data_writer -> transformer_factory "Использует"
+        data_writer -> target "Управляет FDW"
+        target -> source "Забирает данные"
+
+        request_handler_generator -> op_topic_in "Забирает запрос"
+        request_handler_generator -> op_topic_out "Отправляет ответ"
+        request_handler_generator -> task_manager_generator "Запускает задачу"
+        request_handler_generator -> dsl_parser_generator "Использует"
+        task_manager_generator -> data_generator "Управляет"
+        data_generator -> source "Читает"
+        data_generator -> target "Записывает"
+    }
+
+    views {
+        systemlandscape "SystemLandscape" {
+            include *
+            exclude "target -> source"
+        }
+
+        systemcontext main_system "SystemContext" {
+            include *
+            exclude "target -> source"
+        }
+
+        container main_system "Containers" {
+            include *
+            exclude "target -> source"
+        }
+
+        component data_transfer_service "DataTransferComponents" {
+            include *
+        }
+
+        component data_generator_service "DataGeneratorComponents" {
+            include *
+            exclude "target -> source"
+        }
+
+        styles {
+            element "Person" {
+                color #ffffff
+                background #08427b
+                shape Person
+            }
+            element "Dev Person" {
+                color #ffffff
+            }
+            element "Software System" {
+                background #1168bd
+                color #ffffff
+            }
+            element "Existing System" {
+                background #999999
+                color #ffffff
+            }
+            element "Container" {
+                background #438dd5
+                color #ffffff
+            }
+            element "Future" {
+                background #8b00ff
+                color #ffffff
+            }
+            element "Web Browser" {
+                background #8b00ff
+                color #ffffff
+                shape WebBrowser
+            }
+            element "Window" {
+                shape Window
+            }
+            element "Database" {
+                shape Cylinder
+            }
+            element "Queue" {
+                shape Pipe
+                background #999999
+                color #ffffff
+            }
+            element "Component" {
+                background #85bbf0
+                color #000000
+            }
+        }
+    }
+}

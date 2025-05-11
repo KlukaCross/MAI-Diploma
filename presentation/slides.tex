@@ -23,11 +23,11 @@
 	\frame{\titlepage}
 }
 
-\section{Актуальность темы}
 \begin{frame}
 	\frametitle{Актуальность темы}
 	\begin{itemize}
-		\item Тестирование программного продукта крайне важно. \\ Для тестовых сценариев нужны данные.
+		\item Тестирование программного продукта важно.
+		\item Для тестовых сценариев нужны данные.
 		\item Тестирование нельзя проводить в производственной среде, нельзя работать с персональными данными.
 		\item Есть вариант копировать все данные из производственной среды в тестовую с применением анонимизиации, но такой вариант может занимать много времени.
 		\item Часто для тестовых сценариев не нужно много данных, но нужны согласованные данные.
@@ -35,17 +35,11 @@
 \end{frame}
 
 
-\section{Цель и задачи работы}
 \begin{frame}
 	\frametitle{Цель и задачи работы}
 	
-	\textbf{Цель} --- проектирование системы, обеспечивающей перенос взаимосвязанных данных между базами данных, анонимизиацию данных, генерацию тестовых данных. В рамках работы предполагается реализация прототипа данной системы и проведение анализа её жизнеспособности.
-\end{frame}
+	\textbf{Цель} --- проектирование системы, обеспечивающей перенос взаимосвязанных данных между базами данных, их анонимизацию, генерацию тестовых данных.
 
-
-\begin{frame}
-	\frametitle{Цель и задачи работы}
-	
 	\textbf{Задачи:}
 	\begin{enumerate}
 		\item определение требований к проектируемой системе,
@@ -59,18 +53,17 @@
 \end{frame}
 
 
-\section{Постановка задачи}
 \begin{frame}
 	\frametitle{Постановка задачи}
 	
-	Система должна иметь следующую функциональность:
+	Система должна иметь следующую \textbf{функциональность}:
 
 	\begin{itemize}
 		\item перенос и анонимизация данных,
 		\item генерация данных.
 	\end{itemize}
 
-	Архитектура системы должна иметь следующие свойства:
+	Архитектура системы должна иметь следующие \textbf{свойства}:
 	
 	\begin{itemize}
 		\item безопасность,
@@ -85,7 +78,7 @@
 	Взаимодействие систем
 
 	\begin{center}
-		\includegraphics[height = 6cm]{img/structurizr-SystemLandspace}
+		\includegraphics[width = 13cm]{img/structurizr-SystemLandscape-cut}
 	\end{center}
 \end{frame}
 
@@ -94,7 +87,7 @@
 	Система переноса и генерации данных
 
 	\begin{center}
-		\includegraphics[height = 6cm]{img/structurizr-Containers}
+		\includegraphics[height = 6cm]{img/structurizr-Containers-cut}
 	\end{center}
 \end{frame}
 
@@ -104,7 +97,7 @@
 	Компоненты Data Transfer
 
 	\begin{center}
-		\includegraphics[height = 6cm]{img/structurizr-DataTransferComponents}
+		\includegraphics[width = 13cm]{img/structurizr-DataTransferComponents-cut}
 	\end{center}
 \end{frame}
 
@@ -138,6 +131,100 @@
 
 	\begin{center}
 		\includegraphics[height = 6cm]{img/drawio-metagraph}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Алгоритм обхода данных}
+
+	\begin{center}
+		\includegraphics[height = 6.5cm]{img/algorithm-base}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Алгоритм обхода данных}
+
+	\begin{center}
+		\includegraphics[height = 6.5cm]{img/algorithm-with-rules}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Язык описания данных}
+	Примеры описания метаданных для переноса данных
+
+	\begin{center}
+		\includegraphics[width = 12cm]{img/language-1}
+	\end{center}
+
+	\begin{center}
+		\includegraphics[width = 12cm]{img/language-2}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Язык описания данных}
+	Пример описания метаданных для генерации данных
+
+	\begin{center}
+		\includegraphics[width = 12cm]{img/language-3}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Прототип}
+	Возможности:
+
+	\begin{itemize}
+		\item CLI,
+		\item перенос взаимосвязанных данных,
+		\item работа со схемами.
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Тесты производительности}
+	Тестовая база данных: 4.5 ГБ, 44739072 записей.
+
+	\begin{center}
+		\includegraphics[height = 6cm]{img/benchmark}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Анализ результатов}
+	\textbf{Результаты}:
+
+	\begin{itemize}
+		\item спроектирована безопасная и надёжная архитектура,
+		\item разработан удобный язык описания метаданных, похожий на привычный SQL,
+		\item разработан прототип, который показал высокую скорость работы при переносе небольшого количества взаимосвязанных данных.
+	\end{itemize}
+
+	\textbf{Что можно улучшить}:
+
+	\begin{itemize}
+		\item производительность,
+		\item понимание описания метаданных и алгоритма.
+	\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Описание программной разработки}
+	Ссылки на код грамматики и код прототипа (скоро будет).
+
+	\begin{center}
+		\includegraphics[height = 6cm]{img/qr-code-relatio-lang}
 	\end{center}
 \end{frame}
 

@@ -1,0 +1,203 @@
+sequenceDiagram
+
+
+
+participant user as Клиент
+
+
+
+participant op_manager as Operation Manager
+
+
+
+participant op_database as Operation Database
+
+
+
+participant topic as LogBroker
+
+
+
+participant data_transfer as Data Transfer
+
+
+
+
+
+activate data_transfer
+
+
+
+activate op_manager
+
+
+
+activate user
+
+
+
+activate topic
+
+
+
+activate op_database
+
+
+
+
+
+user->>op_manager: Start data transfer
+
+
+
+op_manager->>op_database: Create operation: type="Data Transfer" + status="created"
+
+
+
+op_database-->>op_manager: op_id
+
+
+
+op_manager-->>user: op_id
+
+
+
+op_manager->>topic: Send operation to Operation topic: type="Data Transfer" + ID=op_id
+
+
+
+op_manager->>op_database: Update operation ID=op_id: status="pending"
+
+
+
+data_transfer-->>topic: Read Operation topic
+
+
+
+topic->>data_transfer: Operation: type="Data Transfer" + ID=op_id
+
+
+
+
+
+data_transfer-->data_transfer: Start data transfer
+
+
+
+deactivate data_transfer
+
+
+
+par Check result topic
+
+
+
+loop Check result topic
+
+
+
+op_manager->>topic: Read Operation result topic
+
+
+
+end
+
+
+
+and Check status
+
+
+
+loop Check status
+
+
+
+user->>op_manager: Get status for operation with ID=op_id
+
+
+
+op_manager->>op_database: Get operation ID=op_id
+
+
+
+op_database->>op_manager: Operation: type="Data Transfer" + status="pending"
+
+
+
+op_manager->>user: "pending"
+
+
+
+end
+
+
+
+end
+
+
+
+data_transfer-->data_transfer: Data transfer completed
+
+
+
+activate data_transfer
+
+
+
+
+
+data_transfer->>topic: Send operation to Operation result topic: ID=op_id + status="completed"
+
+
+
+op_manager->>topic: Read Operation result topic
+
+
+
+topic->>op_manager: ID=op_id + status="completed"
+
+
+
+op_manager->>op_database: Update operation ID=op_id: status="completed"
+
+
+
+op_manager->>topic: Commit offset
+
+
+
+user->>op_manager: Get status for operation with ID=op_id
+
+
+
+op_manager->>op_database: Get operation ID=op_id
+
+
+
+op_database->>op_manager: Operation: type="Data Transfer" + status="completed"
+
+
+
+op_manager->>user: "completed"
+
+
+
+
+
+deactivate op_manager
+
+
+
+deactivate user
+
+
+
+deactivate op_database
+
+
+
+deactivate topic
+
+
+
+deactivate data_transfer
