@@ -48,8 +48,9 @@ workspace "Data manager workspace"
 
         # relationships to/from components
         request_handler_transfer -> queue "Читает запросы и записывает ответ"
-        request_handler_transfer -> graph_walker "Управляет"
-        request_handler_transfer -> data_writer "Управляет"
+        request_handler_transfer -> graph_walker "Передаёт конфигурацию"
+        request_handler_transfer -> data_writer "Запускает"
+        request_handler_transfer -> transformer_factory "Передаёт конфигурацию"
         graph_walker -> source "Читает"
         graph_walker -> data_writer "Передаёт информацию"
         data_writer -> transformer_factory "Использует"
