@@ -8,7 +8,7 @@ workspace "Data manager workspace"
         secrets = softwaresystem "Система управления секретами" "Хранит и выдаёт 'секреты'" "Existing System"
 
         source = softwaresystem "Исходная база данных" "Например, производственная база данных" "Database"
-        target = softwaresystem "Целевая базы данных" "Например, тестовая база данных" "Database"
+        target = softwaresystem "Целевая база данных" "Например, тестовая база данных" "Database"
 
         main_system = softwaresystem "Система переноса и генерации данных" {
             op_manager = container "Operation manager" "Управляет операциями -- запросами от пользователей" "Python"

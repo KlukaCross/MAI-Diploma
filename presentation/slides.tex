@@ -28,6 +28,8 @@
 	\begin{itemize}
 		\item Тестирование программного продукта является важной частью разработки.
 
+		\item В образовательной платформе Яндекс.Учебник возникла необходимость в получении данных для тестирования.
+
 		\item Тестирование в производственной среде сопряжено с рисками:
 		\begin{itemize}
 			\item нагрузка на систему;
@@ -58,7 +60,7 @@
 		\item анализ аналогов;
 		\item проектирование архитектуры;
 		\item разработка алгоритмов переноса и генерации;
-		\item разработка языка для описания данных;
+		\item разработка расширения SQL для описания данных;
 		\item реализация минимально жизнеспособного продукта;
 		\item анализ результатов.
 	\end{enumerate}
@@ -82,20 +84,27 @@
 
 
 \begin{frame}
-\frametitle{Определение метаграфа}
-	\textbf{Предпосылки} к использованию метаграфов:
-
+\frametitle{Формализация базы данных}
+	\textbf{Требования к модели данных}:
 	\begin{itemize}
-		\item требовалось формализовать схему базы данных;
-		\item классические графы и ER-модель не подходят ввиду ограниченных возможностей.
+		\item представление связей между данными;
+		\item создание и удаление связей;
+		\item установка атрибутов на связи.
 	\end{itemize}
 
-	\textbf{Определение:} $MG = \langle V, MV, E, ME \rangle$ -- метаграф, где $V$ -- множество вершин, $MV$ -- множество метавершин, $E$ -- множество рёбер, $ME$ -- множество метарёбер.
+	\textbf{Расширение модели}:
+	\begin{itemize}
+		\item поддержка межбазовых связей;
+		\item описание процесса обхода данных.
+	\end{itemize}
 \end{frame}
 
 
 \begin{frame}
-\frametitle{Соответствие метаграфа и базы данных}
+\frametitle{Определение метаграфа}
+	\textbf{Определение:} $MG = \langle V, MV, E, ME \rangle$ -- метаграф, где $V$ -- множество вершин, $MV$ -- множество метавершин, $E$ -- множество рёбер, $ME$ -- множество метарёбер.
+
+	\textbf{Соответствие метаграфа и базы данных}:
 	\begin{itemize}
 		\item вершины $\Leftrightarrow$ записи;
 		\item метавершины $\Leftrightarrow$ таблицы;
@@ -122,32 +131,19 @@
 
 
 \begin{frame}
-\frametitle{Алгоритм обхода данных}
-
-	\begin{center}
-		\includegraphics[height = 6.5cm]{img/algorithm-base}
-	\end{center}
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Опреление правил метаграфа}
+\frametitle{Определение правил метаграфа}
 	\textbf{Предпосылки} к использованию правил метаграфа:
 	\begin{itemize}
-		\item изменение связей в метаграфе;
+		\item добавление связей в метаграф;
 		\item ограничение обхода метаграфа.
 	\end{itemize}
 
-	\textbf{Определение:} $r = \langle p, f \rangle$ -- правило метаграфа, где $p$ — предикат, а $f$ — функция, изменяющая множество рёбер (метарёбер) метаграфа.
-
-	$p: e => \{True, False\}$, где $e \in E$, $E$ -- множество рёбер (метарёбер).
-
-	$f: E => E'$, где $E$ и $E'$ -- множество и обновлённое множество рёбер (метарёбер).
+	\textbf{Определение:} $r: E => E'$ -- правило метаграфа, где $E$ и $E'$ -- множество и обновлённое множество рёбер (метарёбер).
 \end{frame}
 
 
 \begin{frame}
-\frametitle{Алгоритм обхода данных с правилами метаграфа}
+\frametitle{Алгоритм обхода данных}
 	\begin{center}
 		\includegraphics[height = 6.5cm]{img/algorithm-with-rules}
 	\end{center}
@@ -155,21 +151,10 @@
 
 
 \begin{frame}
-\frametitle{Язык описания обхода и трансформации данных}
-	Разработан язык на основе грамматики SQL стандарта SQL-92 с помощью инструмента ANTLR4.
-\end{frame}
+\frametitle{Описание обхода и трансформации данных}
+	Разработано расширение для языка SQL с помощью инструмента ANTLR4.
 
-
-\begin{frame}
-\frametitle{Примеры грамматических конструкций на ANTLR4}
-	\begin{center}
-		\includegraphics[height = 6.5cm]{img/grammar}
-	\end{center}
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Пример описания обхода и трансформации данных}
+	Пример описания:
 	\begin{center}
 		\includegraphics[width = 12cm]{img/language-1}
 	\end{center}
@@ -203,7 +188,7 @@
 
 	\begin{itemize}
 		\item спроектирована общая архитектура;
-		\item разработан язык описания обхода и трансформации данных;
+		\item разработано расширение SQL для описания обхода и трансформации данных;
 		\item реализован минимально жизнеспособный продукт.
 	\end{itemize}
 
@@ -222,23 +207,14 @@
 
 	\begin{center}
 		\includegraphics[height = 6cm]{img/qr-code-relatio-lang}
+		\includegraphics[height = 6cm]{img/qr-code-mvp}
 	\end{center}
 \end{frame}
 
 
 \begin{frame}
 \frametitle{Приложения}
-	Алгоритм генерации данных
-
-	\begin{center}
-		\includegraphics[height = 6cm]{img/extra-alg-generator}
-	\end{center}
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Приложения}
-	Архитектура на уровне контекста
+	Архитектура на уровне контекста.
 
 	\begin{center}
 		\includegraphics[height = 6cm]{img/structurizr-SystemLandscape}
@@ -248,7 +224,7 @@
 
 \begin{frame}
 \frametitle{Приложения}
-	Архитектура на уровне контейнеров
+	Архитектура на уровне контейнеров.
 
 	\begin{center}
 		\includegraphics[height = 6cm]{img/structurizr-Containers}
@@ -258,10 +234,66 @@
 
 \begin{frame}
 \frametitle{Приложения}
-	Архитектура на уровне компонент (Data Transfer)
+	Архитектура на уровне компонент (Data Transfer).
 
 	\begin{center}
 		\includegraphics[height = 6cm]{img/structurizr-DataTransferComponents}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Приложения}
+	Модель метаграфа, предложенная в работе: \textbf{Использование метаграфов для описания семантики и прагматики информационных систем} (Самохвалов Э. Н., Ревунков Г. И., Гапанюк Ю. Е.).
+
+	\textbf{Метаграф}: $S = \langle V, MV, E, ME \rangle$, где $V$ -- множество вершин, $MV$ -- множество метавершин, $E$ -- множество рёбер, $ME$ -- множество метарёбер.
+
+	\textbf{Вершина метаграфа}: $v_i = \{ atr_k \}$, $v_i \in V$, где $atr_k$ -- атрибут.
+
+	\textbf{Ребро метаграфа}: $e_i = \langle v_S, v_E, eo, \{ atr_k \} \rangle$, $e_i \in E, eo = true | false$, где $v_S$ -- исходная вершина (метавершина) ребра; $v_E$ -- конечная вершина (метавершина) ребра; $eo$ -- признак направленности ребра; $atr_k$ -- атрибут.
+
+	\textbf{Фрагмент метаграфа}: $MG_i = \{ ev_j \}$, $ev_j \in (V \cup E \cup MV \cup ME)$, где $atr_k$ -- атрибут; $ev_j$ -- элемент, принадлежащий объединению множеств вершин (метавершин) и ребер (метаребер) метаграфа.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Приложения}
+	\textbf{Метавершина метаграфа}: $mv_i = \langle \{ atr_k \}, MG_i \rangle$, $mv_i \in MV, ev_j \in (V \cup E \cup MV \cup ME)$, где $atr_k$ -- атрибут; $MG_i$ -- фрагмент метаграфа.
+
+	\textbf{Метаребро метаграфа}: $me_i = \langle v_S, v_E, eo, \{ atr_k \}, MG_i \rangle$, $e_i \in E, eo = true | false, ev_j \in (V \cup E \cup MV \cup ME)$, где $v_S$ -- исходная вершина (метавершина) ребра; $v_E$ -- конечная вершина (метавершина) ребра; $eo$ -- признак направленности ребра; $atr_k$ -- атрибут; $MG_i$ -- фрагмент метаграфа.
+
+	\begin{center}
+		\includegraphics[height = 3cm]{img/metaedge}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Приложения}
+	Первый алгоритм обхода данных.
+
+	\begin{center}
+		\includegraphics[height = 6.5cm]{img/algorithm-base}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Приложения}
+	Алгоритм генерации данных.
+
+	\begin{center}
+		\includegraphics[height = 6cm]{img/extra-alg-generator}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Приложения}
+	Примеры грамматических конструкций на ANTLR4.
+
+	\begin{center}
+		\includegraphics[height = 6.5cm]{img/grammar}
 	\end{center}
 \end{frame}
 \end{document}
