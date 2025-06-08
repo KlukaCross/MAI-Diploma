@@ -119,6 +119,11 @@ workspace "Data manager workspace"
                 background #85bbf0
                 color #000000
             }
+            relationship "Relationship" {
+                fontSize 30
+                color #000000
+                thickness 3
+            }
         }
     }
 }
